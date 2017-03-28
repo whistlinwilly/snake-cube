@@ -152,21 +152,26 @@ def generate_next_move(curMove):
         return []
     x, y, z = position
     direction = cube[x][y][z]
+
+    next_moves = []
     if snake[snake_index] == 'f':
         delta = 1 if direction.isupper() else -1
         position[encoding[direction]] += delta
         if in_bounds(position):
-            return [(add_to_cube(cube, position, direction), snake_index + 1, position)]
-        else:
-            return []
-    if snake[snake_index] == 'a':
-        next_moves = []
+            next_moves += [
+                (add_to_cube(cube, position, direction),
+                 snake_index + 1, position),
+            ]
+    elif snake[snake_index] == 'a':
         for pos_index, delta, new_dir in adjacent_moves[direction]:
             new_pos = copy.deepcopy(position)
             new_pos[pos_index] += delta
             if in_bounds(new_pos):
-                next_moves += [(add_to_cube(cube, new_pos, new_dir), snake_index + 1, new_pos)]
-        return next_moves
+                next_moves += [
+                    (add_to_cube(cube, new_pos, new_dir),
+                     snake_index + 1, new_pos),
+                ]
+    return next_moves
 
 
 def in_bounds(position):

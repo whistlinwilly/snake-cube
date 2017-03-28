@@ -1,0 +1,11 @@
+### Approach
+-Start with possible representations of snake, cube, etc.
+-How many possible starting positions are there?
+
+### Thoughts
+Seems eerily related to palindromes? The block form at least is made of three distinct palindromes
+which could be a useful pruning heuristic?
+What about solving a 3x3 cube in a 4x4 space?
+
+### Side Questions
+Transform between representations?

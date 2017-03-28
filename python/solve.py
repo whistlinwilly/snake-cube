@@ -3,6 +3,7 @@
 import unittest
 import copy
 from simplejson import dumps # for lazy deep equality testing
+import sys
 
 # Sample Snake Ascii Art!
 # |X|X|X|
@@ -23,7 +24,7 @@ from simplejson import dumps # for lazy deep equality testing
 
 # Possible snake representations
 sample_snake_block_form = [3,2,1,2,1,2,3,1,2,2,1,3,1,3]
-sample_snake_adjacency_form = "sffaaffaffaaffafaaaffafafaf" # f = forced/fixed, a = adjacent s = start? feedback welcome
+sample_snake_adjacency_form = "sffaaafaafaaafafaaaafafafaf" # f = forced/fixed, a = adjacent s = start? feedback welcome
 
 # Cube representation - We need to store either an empty space or a "direction" for sections
 # of the snake that have no degrees of freedom (forced/ fixed sections).
@@ -64,25 +65,49 @@ adjacent_moves = {
 
 # Queue for next move to search
 moves = []
-solved = False
 snake = ""
+debug = False
+furthest_progress = 0
+
+# Pretty print moves
+def print_moves(moves):
+	for move in moves:
+		cube, snake_index, position = move
+		print "\n\nMove " + str(snake_index) + "@ " + str(position) + ":"
+		for y in [2, 1, 0]:
+			sys.stdout.write('\n')
+			for z in range(3):
+				sys.stdout.write('\t')
+				for x in range(3):
+					sys.stdout.write(cube[x][y][z])
+		print ""
 
 # The general idea here is to generate legal next move choices and add them to the queue to be processed.
 # If we empty the queue before reaching the end of the string, there are no possible solutions. A move
 # takes the form (cube, snake_index, position).
 def solve(_snake):
+	solved = False
 	if len(_snake) != 27 or _snake[0] != "s":
 		return "Invalid"
 	global moves, snake
 	snake = _snake
 	cube = init_cube()
+	if debug:
+		print "Ready to begin! Starting moves:"
+		print_moves(generate_starting_moves(cube))
 	moves += generate_starting_moves(cube)
-	while len(moves) > 0 and not solved:
+	while len(moves) > 0:
 		curMove = moves[0]
 		# Dequeue
 		moves = moves[1:]
+		_, index, _ = curMove
+		if index == len(snake):
+			solved = True
+			break
 		moves += generate_next_move(curMove)
 	if solved:
+		print "SOLUTION:"
+		print_moves([curMove])
 		return "Solveable!"
 	else:
 		return "Invalid"
@@ -117,8 +142,15 @@ def add_to_cube(cube, position, direction):
 # direction, check that we are still within bounds, and set the position
 # in the cube.
 def generate_next_move(curMove):
+	if debug:
+		print "Current move: "
+		print_moves([curMove])
 	cube, snake_index, position = curMove
-	print snake_index, len(snake)
+	global furthest_progress
+	if snake_index > furthest_progress:
+		furthest_progress = snake_index
+		sys.stdout.write(str(furthest_progress))
+		sys.stdout.flush()
 	if snake_index == len(snake):
 		global solved
 		solved = True
@@ -128,18 +160,32 @@ def generate_next_move(curMove):
 	if snake[snake_index] == 'f':
 		delta = 1 if direction.isupper() else -1
 		position[encoding[direction]] += delta
-		if in_bounds(position):
+		if in_bounds(position) and empty(cube, position):
+			if debug:
+				print "Next moves:"
+				print_moves([(add_to_cube(cube, position, direction), snake_index + 1, position)])
 			return [(add_to_cube(cube, position, direction), snake_index + 1, position)]
 		else:
+			if debug:
+				print "No next moves"
 			return []
 	if snake[snake_index] == 'a':
 		next_moves = []
 		for pos_index, delta, new_dir in adjacent_moves[direction]:
 			new_pos = copy.deepcopy(position)
 			new_pos[pos_index] += delta
-			if in_bounds(new_pos):
+			if in_bounds(new_pos) and empty(cube, new_pos):
 				next_moves += [(add_to_cube(cube, new_pos, new_dir), snake_index + 1, new_pos)]
+		if debug:
+			print "Next moves:"
+			print_moves(next_moves)
 		return next_moves
+
+def empty(cube, position):
+	x, y, z = position
+	if cube[x][y][z] == 'E':
+		return True
+	return False
 
 def in_bounds(position):
 	for i in [0, 1, 2]:
@@ -156,5 +202,5 @@ class SnakeTests(unittest.TestCase):
 		# solve
 		self.assertEqual(solve("fff"), "Invalid")
 		self.assertEqual(snake, "")
-		self.assertEqual(solve(sample_snake_adjacency_form), "Solvable") # temporary
+		self.assertEqual(solve(sample_snake_adjacency_form), "Solveable!") 
 		self.assertEqual(snake, sample_snake_adjacency_form)

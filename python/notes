@@ -5,7 +5,11 @@
 ### Thoughts
 Seems eerily related to palindromes? The block form at least is made of three distinct palindromes
 which could be a useful pruning heuristic?
+
+This isn't true, look at snake example #2
+
 What about solving a 3x3 cube in a 4x4 space?
 
 ### Side Questions
 Transform between representations?
+Snake example #2 was taken from an online example, but produces a different, seemingly correct solution. Do puzzles have more than one unique solution?

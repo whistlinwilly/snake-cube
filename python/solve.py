@@ -47,6 +47,24 @@ sample_snake_adjacency_form_1 = "sffaaafaafaaafafaaaafafafaf" # f = forced/fixed
 sample_snake_block_form_2 = [3,1,2,1,2,1,2,2,1,3,1,2,1,3,1,1]
 sample_snake_adjacency_form_2 = "sffafaafaafaaaafafafaafafaf"
 
+# Sample Snake 3 Ascii Art!
+# |X|X|X|
+#     |X|
+#     |X|X|X|
+#         |X|
+#         |X|X|
+#           |X|X|
+#             |X|
+#             |X|X|X|
+#                 |X|X|
+#                   |X|
+#                   |X|X|
+#                     |X|
+#                     |X|X|
+#                       |X|X|X|
+
+sample_snake_block_form_3 = [3,1,3,1,2,2,1,3,2,1,2,1,2,3]
+sample_snake_adjacency_form_3 = "sffafafafaaaafafaaafaafaaaf"
 
 # Cube representation - We need to store the "direction" of the piece at each position in order
 # to calculate valid next moves for both fixed and adjacent blocks. Because the direction
@@ -239,3 +257,4 @@ class SnakeTests(unittest.TestCase):
 		self.assertEqual(solve(sample_snake_adjacency_form_1), "Solveable!") 
 		self.assertEqual(snake, sample_snake_adjacency_form_1)
 		self.assertEqual(solve(sample_snake_adjacency_form_2), "Solveable!") 
+		self.assertEqual(solve(sample_snake_adjacency_form_3), "Solveable!") 
